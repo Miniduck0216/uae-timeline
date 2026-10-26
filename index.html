@@ -6,198 +6,281 @@
 <title>UAE Timeline</title>
 <style>
   :root {
-    --ink: #1d2a24;
-    --muted: #6b7a72;
-    --paper: #f5f2ea;
-    --green: #00732f;
-    --red: #ff0000;
-    --black: #111;
-    --line: #d8d3c4;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body {
-    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-    color: var(--ink);
-    background: var(--paper);
-    overflow-x: hidden;
-    min-height: 100vh;
+    --color-warm-cream: #ffedd7;
+    --color-walnut-shadow: #100904;
+    --color-bark-brown: #382416;
+    --color-cork-border: #40372e;
+    --color-driftwood: #6c5f51;
+    --color-ember-accent: #dc5000;
+
+    --text-subheading: 18px;
+    --text-heading-sm: 24px;
+    --text-body: 29px;
+    --text-heading: 41px;
+    --text-display: 51px;
+
+    --radius-cards: 12px;
+    --radius-buttons-pill: 36px;
+    --radius-buttons-outlined: 22.5px;
   }
 
-  /* ---------- Layers (parallax) ---------- */
-  .scene {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --color-walnut-shadow: #100904; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Inter", "Söhne", "Neue Haas Grotesk", Arial, system-ui, sans-serif;
+    font-feature-settings: "ss01" on;
+    background: var(--color-walnut-shadow);
+    color: var(--color-warm-cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  button { font: inherit; color: inherit; }
+
+  /* Uppercase, weight 500, normal tracking: the system's default voice */
+  .caps { text-transform: uppercase; font-weight: 500; letter-spacing: normal; }
+
+  /* ---------- Fixed top navigation ---------- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; padding: 22px 32px;
+    background: transparent;
+  }
+  .wordmark { font-size: 14px; }
+  .years { display: flex; gap: 22px; }
+  .years button {
+    background: none; border: 0; cursor: pointer;
+    font-size: 12px; text-transform: uppercase; font-weight: 500;
+    padding: 4px 0; color: var(--color-warm-cream); opacity: .55;
+    border-bottom: 1px dashed transparent;
+    transition: opacity .2s, border-color .2s;
+  }
+  .years button:hover { opacity: 1; }
+  .years button[aria-selected="true"] {
+    opacity: 1; border-bottom-color: var(--color-warm-cream);
+  }
+  .years button:focus-visible,
+  .btn:focus-visible,
+  .pill:focus-visible,
+  .dot:focus-visible { outline: 1px dashed var(--color-warm-cream); outline-offset: 4px; }
+
+  /* ---------- Layers (subtle parallax, no shadows) ---------- */
+  .layers {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
   }
   .layer {
-    position: absolute; left: -5%; width: 110%;
-    transition: transform .6s cubic-bezier(.2,.7,.2,1);
+    position: absolute; left: -6%; width: 112%;
+    transition: transform .8s cubic-bezier(.2,.7,.2,1);
   }
   .layer svg { width: 100%; height: auto; display: block; }
-  .layer.back  { bottom: 22%; opacity: .35; }
-  .layer.mid   { bottom: 10%; opacity: .6; }
-  .layer.front { bottom: -2%; opacity: 1; }
-  .sun {
-    position: absolute; right: 12%; top: 14%;
-    width: 120px; height: 120px; border-radius: 50%;
-    background: var(--green); opacity: .9;
-    transition: transform .6s cubic-bezier(.2,.7,.2,1), background .6s;
+  .layer.back  { bottom: 16%; opacity: .45; }
+  .layer.mid   { bottom: 6%;  opacity: .7; }
+  .layer.front { bottom: -2%; }
+
+  /* ---------- Layout ---------- */
+  main { position: relative; z-index: 1; }
+  section { position: relative; min-height: 100vh; }
+
+  /* Hero */
+  .hero {
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 32px 96px;
+  }
+  .hero .label { font-size: 12px; color: var(--color-warm-cream); opacity: .7; margin-bottom: 18px; }
+  .hero h1 {
+    font-size: clamp(40px, 8vw, 96px);
+    line-height: .9;
+    font-weight: 500;
+    text-transform: uppercase;
+    max-width: 14ch;
+  }
+  .hero .intro {
+    margin-top: 28px; max-width: 460px;
+    font-size: 18px; line-height: 1.26; font-weight: 400;
+  }
+  .hero .actions { margin-top: 36px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .divider {
+    border: 0; border-top: 1px dashed var(--color-cork-border);
+    margin: 0 32px;
   }
 
-  /* ---------- Content ---------- */
-  main {
-    position: relative; z-index: 1;
-    max-width: 1100px; margin: 0 auto;
-    padding: 56px 24px 120px;
-  }
-  header { margin-bottom: 48px; }
-  .eyebrow {
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
-    color: var(--muted);
-  }
-  h1 {
-    font-size: clamp(36px, 6vw, 72px);
-    font-weight: 300; letter-spacing: -.02em; line-height: 1;
-    margin-top: 12px;
-  }
-  h1 strong { font-weight: 700; }
-  .lede { margin-top: 16px; max-width: 520px; color: var(--muted); font-size: 16px; line-height: 1.5; }
-
-  /* ---------- Timeline track ---------- */
-  .track {
-    position: relative;
-    display: flex; justify-content: space-between;
-    margin: 40px 0 36px;
-    padding-top: 18px;
-  }
-  .track::before {
-    content: ""; position: absolute; left: 0; right: 0; top: 26px;
-    height: 1px; background: var(--line);
-  }
-  .progress {
-    position: absolute; left: 0; top: 25px; height: 3px;
-    background: var(--ink); width: 0;
-    transition: width .5s cubic-bezier(.2,.7,.2,1);
-  }
-  .node {
-    position: relative; z-index: 1;
-    background: none; border: 0; cursor: pointer;
-    font: inherit; color: var(--muted);
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
-    flex: 1; text-align: center;
-  }
-  .dot {
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--paper); border: 1px solid var(--ink);
-    transition: background .3s, transform .3s;
-  }
-  .node:hover .dot { transform: scale(1.25); }
-  .node[aria-selected="true"] { color: var(--ink); }
-  .node[aria-selected="true"] .dot { background: var(--ink); transform: scale(1.3); }
-  .node .yr { font-size: 15px; font-weight: 600; letter-spacing: .02em; }
-
-  /* ---------- Detail card ---------- */
-  .card {
-    background: rgba(255,255,255,.72);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 36px;
-    display: grid; grid-template-columns: 1fr 220px; gap: 32px;
-    align-items: center;
-    min-height: 260px;
-    transition: opacity .35s, transform .35s;
-  }
-  .card.swap { opacity: 0; transform: translateY(8px); }
-  .card h2 { font-size: 28px; font-weight: 600; letter-spacing: -.01em; }
-  .card .tag {
-    display: inline-block; margin-bottom: 14px;
-    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--muted);
-  }
-  .card p { margin-top: 14px; font-size: 16px; line-height: 1.6; color: #33413a; }
-  .icon {
-    width: 100%; aspect-ratio: 1; border-radius: 14px;
-    background: var(--paper); border: 1px solid var(--line);
-    display: grid; place-items: center;
-  }
-  .icon svg { width: 62%; height: 62%; }
-
-  .controls {
-    display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end;
+  /* Buttons */
+  .pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-buttons-pill);
+    background: var(--color-bark-brown);
+    color: var(--color-warm-cream);
+    border: 0; padding: 14px 24px; cursor: pointer;
+    font-size: 14px; text-transform: uppercase; font-weight: 500;
+    text-decoration: none;
   }
   .btn {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 1px solid var(--ink); background: transparent; color: var(--ink);
-    font-size: 18px; cursor: pointer; transition: background .2s, color .2s;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-buttons-outlined);
+    background: transparent;
+    color: var(--color-warm-cream);
+    border: 1px solid var(--color-warm-cream);
+    padding: 8px 18px; cursor: pointer;
+    font-size: 12px; text-transform: uppercase; font-weight: 500;
+    min-width: 96px;
   }
-  .btn:hover { background: var(--ink); color: var(--paper); }
-  .btn:focus-visible, .node:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+  .btn:hover { background: var(--color-warm-cream); color: var(--color-walnut-shadow); }
 
-  footer {
-    margin-top: 48px; font-size: 12px; color: var(--muted);
-    letter-spacing: .04em;
+  /* Event stage: three columns, text / object / text */
+  .stage {
+    display: grid;
+    grid-template-columns: 1fr minmax(220px, 340px) 1fr;
+    gap: 18px;
+    align-items: center;
+    padding: 120px 32px 96px;
+    min-height: 100vh;
   }
+  .stage .tag { font-size: 12px; color: var(--color-ember-accent); }
+  .stage h2 {
+    font-size: var(--text-heading);
+    line-height: .9;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-top: 14px;
+  }
+  .stage .copy {
+    font-size: var(--text-body);
+    line-height: 1.26;
+    font-weight: 400;
+    margin-top: 0;
+  }
+  .stage .step {
+    font-size: 12px; text-transform: uppercase; font-weight: 500;
+    opacity: .6; margin-bottom: 18px;
+  }
+
+  .object {
+    position: relative;
+    aspect-ratio: 1;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    border: 1px dashed var(--color-driftwood);
+    transition: opacity .35s, transform .35s;
+  }
+  .object svg { width: 58%; height: 58%; }
+  .stage.swap .object,
+  .stage.swap .tag,
+  .stage.swap h2,
+  .stage.swap .copy { opacity: 0; transform: translateY(8px); }
+  .object, .tag, h2, .copy { transition: opacity .35s, transform .35s; }
+
+  .stage .side-left { text-align: left; }
+  .stage .side-right { text-align: left; display: flex; flex-direction: column; gap: 28px; }
+  .controls { display: flex; gap: 12px; margin-top: 8px; }
+
+  /* Vertical sidebar label */
+  .edge {
+    position: fixed; right: 18px; top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: right center;
+    font-size: 10px; text-transform: uppercase; font-weight: 500;
+    z-index: 5; opacity: .6; white-space: nowrap;
+  }
+
+  /* Footer */
+  footer {
+    position: relative; z-index: 1;
+    padding: 32px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    font-size: 12px; text-transform: uppercase; font-weight: 500;
+  }
+  footer .credit { color: var(--color-ember-accent); }
 
   /* ---------- Responsive ---------- */
-  @media (max-width: 760px) {
-    .card { grid-template-columns: 1fr; padding: 26px; }
-    .icon { max-width: 140px; }
-    .track { overflow-x: auto; padding-bottom: 8px; }
-    .node { min-width: 84px; }
+  @media (max-width: 900px) {
+    .stage { grid-template-columns: 1fr; text-align: left; padding-top: 110px; gap: 28px; }
+    .stage .object { width: 220px; order: -1; }
+    .stage .copy { font-size: 22px; }
+    .years { gap: 14px; overflow-x: auto; max-width: 62vw; }
+    .edge { display: none; }
+  }
+  @media (max-width: 560px) {
+    .nav { padding: 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .years { max-width: 100%; }
+    .hero, .stage, footer, .divider { padding-left: 16px; padding-right: 16px; }
+    .divider { margin: 0 16px; }
+    .stage h2 { font-size: 30px; }
+    .hero .intro { font-size: 16px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
+    * { transition: none !important; scroll-behavior: auto !important; }
   }
 </style>
 </head>
 <body>
 
-<div class="scene" aria-hidden="true">
-  <div class="sun" id="sun"></div>
+<div class="layers" aria-hidden="true">
   <div class="layer back" id="l1">
     <svg viewBox="0 0 1200 260" preserveAspectRatio="none">
-      <path fill="#b9c9bf" d="M0 200 Q200 90 420 170 T860 150 T1200 120 L1200 260 L0 260Z"/>
+      <path fill="#382416" d="M0 200 Q200 90 420 170 T860 150 T1200 120 L1200 260 L0 260Z"/>
     </svg>
   </div>
   <div class="layer mid" id="l2">
     <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
-      <path fill="#7f9a8a" d="M0 170 Q260 60 520 150 T1040 120 T1200 140 L1200 240 L0 240Z"/>
+      <path fill="#40372e" d="M0 170 Q260 60 520 150 T1040 120 T1200 140 L1200 240 L0 240Z"/>
     </svg>
   </div>
   <div class="layer front" id="l3">
     <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
-      <path fill="#1d2a24" d="M0 150 Q300 110 600 140 T1200 120 L1200 200 L0 200Z"/>
+      <path fill="#382416" d="M0 150 Q300 110 600 140 T1200 120 L1200 200 L0 200Z"/>
     </svg>
   </div>
 </div>
 
+<nav class="nav" aria-label="Timeline">
+  <span class="wordmark caps">UAE Timeline</span>
+  <div class="years" id="years" role="tablist"></div>
+</nav>
+
+<div class="edge caps">Federation · 1971 · Seven emirates</div>
+
 <main>
-  <header>
-    <div class="eyebrow">History · 1966 — 2004</div>
-    <h1>The making of <strong>the UAE</strong></h1>
-    <p class="lede">A short timeline: from Abu Dhabi's new ruler to a federation of seven emirates, with Sheikh Zayed bin Sultan Al Nahyan at the center.</p>
-  </header>
-
-  <nav class="track" id="track" role="tablist" aria-label="Timeline">
-    <div class="progress" id="progress"></div>
-  </nav>
-
-  <section class="card" id="card" aria-live="polite">
-    <div>
-      <span class="tag" id="cardTag"></span>
-      <h2 id="cardTitle"></h2>
-      <p id="cardText"></p>
+  <section class="hero" id="intro">
+    <span class="label caps">History · 1966 — 2004</span>
+    <h1>The making of the UAE</h1>
+    <p class="intro">From a new ruler in Abu Dhabi to a federation of seven emirates, with Sheikh Zayed bin Sultan Al Nahyan at the center.</p>
+    <div class="actions">
+      <a class="pill" href="#timeline">Start</a>
     </div>
-    <div class="icon" id="cardIcon"></div>
   </section>
 
-  <div class="controls">
-    <button class="btn" id="prev" aria-label="Previous event">←</button>
-    <button class="btn" id="next" aria-label="Next event">→</button>
-  </div>
+  <hr class="divider">
 
-  <footer>Use ← → keys or the dots. Move your pointer to shift the layers.</footer>
+  <section class="stage" id="timeline" aria-live="polite">
+    <div class="side-left">
+      <span class="step caps" id="step"></span>
+      <span class="tag caps" id="tag"></span>
+      <h2 id="title"></h2>
+    </div>
+
+    <div class="object" id="object"></div>
+
+    <div class="side-right">
+      <p class="copy" id="copy"></p>
+      <div class="controls">
+        <button class="btn caps" id="prev" aria-label="Previous event">← Prev</button>
+        <button class="btn caps" id="next" aria-label="Next event">Next →</button>
+      </div>
+    </div>
+  </section>
 </main>
+
+<hr class="divider">
+
+<footer>
+  <span>Use ← → keys or the year tabs</span>
+  <span class="credit">UAE · 1966 — 2004</span>
+</footer>
 
 <script>
   const events = [
@@ -206,99 +289,100 @@
       tag: "Abu Dhabi",
       title: "Zayed becomes ruler",
       text: "Sheikh Zayed bin Sultan Al Nahyan becomes ruler of Abu Dhabi in August 1966, taking over from his brother.",
-      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linecap="round"><path d="M12 46h40M16 46V30M28 46V30M40 46V30M48 46V30M10 30h44M32 14l18 12H14z"/></svg>`
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#ffedd7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 46h40M16 46V30M28 46V30M40 46V30M48 46V30M10 30h44M32 14l18 12H14z"/></svg>`
     },
     {
       year: "1968",
       tag: "Context",
       title: "Britain leaves the Gulf",
       text: "London announces it will end its treaty role in the Gulf by 1971, pushing the emirates to decide their future together.",
-      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linecap="round"><path d="M32 12v34M22 22h20M18 46c4 4 24 4 28 0M24 46l-6-12M40 46l6-12"/><circle cx="32" cy="12" r="3"/></svg>`
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#ffedd7" stroke-width="2" stroke-linecap="round"><path d="M32 12v34M22 22h20M18 46c4 4 24 4 28 0M24 46l-6-12M40 46l6-12"/><circle cx="32" cy="12" r="3"/></svg>`
     },
     {
       year: "1971",
       tag: "Federation",
       title: "Six emirates unite",
       text: "On 2 December 1971, Abu Dhabi, Dubai, Sharjah, Ajman, Umm Al Quwain and Fujairah form the United Arab Emirates. Ras Al Khaimah joins a few months later.",
-      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5"><circle cx="32" cy="16" r="6"/><circle cx="16" cy="30" r="6"/><circle cx="48" cy="30" r="6"/><circle cx="22" cy="46" r="6"/><circle cx="42" cy="46" r="6"/><circle cx="32" cy="32" r="6" fill="#00732f" stroke="#00732f"/></svg>`
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#ffedd7" stroke-width="2"><circle cx="32" cy="16" r="6"/><circle cx="16" cy="30" r="6"/><circle cx="48" cy="30" r="6"/><circle cx="22" cy="46" r="6"/><circle cx="42" cy="46" r="6"/><circle cx="32" cy="32" r="6" fill="#ffedd7"/></svg>`
     },
     {
       year: "1971",
       tag: "Presidency",
       title: "Zayed, first president",
       text: "Sheikh Zayed is chosen as the founder and first President of the UAE, a role he holds until 2004.",
-      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linejoin="round"><path d="M32 8l6.5 16H56L42 34l5 17-15-10-15 10 5-17L8 24h17.5z"/></svg>`
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#ffedd7" stroke-width="2" stroke-linejoin="round"><path d="M32 8l6.5 16H56L42 34l5 17-15-10-15 10 5-17L8 24h17.5z"/></svg>`
     },
     {
       year: "2004",
       tag: "Legacy",
       title: "A nation built to last",
       text: "Sheikh Zayed dies in November 2004. His son Khalifa becomes president, and the federation he built continues.",
-      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linecap="round"><path d="M10 44h44M18 44a14 14 0 0128 0"/><path d="M32 18v8M22 24l4 4M42 24l-4 4"/></svg>`
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#ffedd7" stroke-width="2" stroke-linecap="round"><path d="M10 44h44M18 44a14 14 0 0128 0"/><path d="M32 18v8M22 24l4 4M42 24l-4 4"/></svg>`
     }
   ];
 
-  const track = document.getElementById("track");
-  const progress = document.getElementById("progress");
-  const card = document.getElementById("card");
-  const cardTag = document.getElementById("cardTag");
-  const cardTitle = document.getElementById("cardTitle");
-  const cardText = document.getElementById("cardText");
-  const cardIcon = document.getElementById("cardIcon");
-  const sun = document.getElementById("sun");
-  const layers = [
-    [document.getElementById("l1"), 14],
-    [document.getElementById("l2"), 28],
-    [document.getElementById("l3"), 44]
-  ];
+  const $ = id => document.getElementById(id);
+  const yearsEl = $("years");
+  const stage = document.querySelector(".stage");
+  const stepEl = $("step"), tagEl = $("tag"), titleEl = $("title");
+  const copyEl = $("copy"), objectEl = $("object");
+  const layers = [[$("l1"), 10], [$("l2"), 20], [$("l3"), 30]];
 
-  // Build nodes
-  const nodes = events.map((ev, i) => {
+  // Year tabs in the fixed nav
+  const tabs = events.map((ev, i) => {
     const b = document.createElement("button");
-    b.className = "node";
     b.setAttribute("role", "tab");
     b.setAttribute("aria-label", `${ev.year}: ${ev.title}`);
-    b.innerHTML = `<span class="dot"></span><span class="yr">${ev.year}</span>`;
+    b.textContent = ev.year;
     b.addEventListener("click", () => show(i));
-    track.insertBefore(b, progress);
+    yearsEl.appendChild(b);
     return b;
   });
 
   let current = 0;
-  function show(i) {
-    current = (i + events.length) % events.length;
-    const ev = events[current];
-    card.classList.add("swap");
-    setTimeout(() => {
-      cardTag.textContent = `${ev.year} · ${ev.tag}`;
-      cardTitle.textContent = ev.title;
-      cardText.textContent = ev.text;
-      cardIcon.innerHTML = ev.icon;
-      card.classList.remove("swap");
-    }, 180);
-    nodes.forEach((n, k) => n.setAttribute("aria-selected", k === current ? "true" : "false"));
-    progress.style.width = `${(current / (events.length - 1)) * 100}%`;
-    sun.style.transform = `translateX(${current * -18}px) scale(${1 - current * 0.04})`;
-    sun.style.background = ["#00732f","#c49a2c","#ff0000","#1d2a24","#7f9a8a"][current];
+  let timer = null;
+
+  function render(i) {
+    const ev = events[i];
+    stepEl.textContent = `${String(i + 1).padStart(2, "0")} / ${String(events.length).padStart(2, "0")}`;
+    tagEl.textContent = `${ev.year} · ${ev.tag}`;
+    titleEl.textContent = ev.title;
+    copyEl.textContent = ev.text;
+    objectEl.innerHTML = ev.icon;
+    tabs.forEach((t, k) => t.setAttribute("aria-selected", k === i ? "true" : "false"));
   }
 
-  document.getElementById("prev").addEventListener("click", () => show(current - 1));
-  document.getElementById("next").addEventListener("click", () => show(current + 1));
+  function show(i) {
+    const next = (i + events.length) % events.length;
+    if (next === current && timer) return;
+    current = next;
+    stage.classList.add("swap");
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      render(current);
+      stage.classList.remove("swap");
+      timer = null;
+    }, 220);
+  }
+
+  $("prev").addEventListener("click", () => show(current - 1));
+  $("next").addEventListener("click", () => show(current + 1));
   window.addEventListener("keydown", e => {
     if (e.key === "ArrowRight") show(current + 1);
     if (e.key === "ArrowLeft") show(current - 1);
   });
 
-  // Parallax on pointer
+  // Subtle parallax on pointer movement
   window.addEventListener("pointermove", e => {
-    const x = (e.clientX / window.innerWidth - 0.5);
-    const y = (e.clientY / window.innerHeight - 0.5);
+    const x = e.clientX / window.innerWidth - 0.5;
+    const y = e.clientY / window.innerHeight - 0.5;
     layers.forEach(([el, depth]) => {
-      el.style.transform = `translate(${x * depth}px, ${y * depth * 0.5}px)`;
+      el.style.transform = `translate(${x * depth}px, ${y * depth * 0.4}px)`;
     });
   });
 
-  show(0);
+  render(0);
+  tabs[0].setAttribute("aria-selected", "true");
 </script>
 </body>
 </html>
