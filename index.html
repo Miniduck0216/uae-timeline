@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UAE Timeline</title>
+<style>
+  :root {
+    --ink: #1d2a24;
+    --muted: #6b7a72;
+    --paper: #f5f2ea;
+    --green: #00732f;
+    --red: #ff0000;
+    --black: #111;
+    --line: #d8d3c4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ---------- Layers (parallax) ---------- */
+  .scene {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  }
+  .layer {
+    position: absolute; left: -5%; width: 110%;
+    transition: transform .6s cubic-bezier(.2,.7,.2,1);
+  }
+  .layer svg { width: 100%; height: auto; display: block; }
+  .layer.back  { bottom: 22%; opacity: .35; }
+  .layer.mid   { bottom: 10%; opacity: .6; }
+  .layer.front { bottom: -2%; opacity: 1; }
+  .sun {
+    position: absolute; right: 12%; top: 14%;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: var(--green); opacity: .9;
+    transition: transform .6s cubic-bezier(.2,.7,.2,1), background .6s;
+  }
+
+  /* ---------- Content ---------- */
+  main {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto;
+    padding: 56px 24px 120px;
+  }
+  header { margin-bottom: 48px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 300; letter-spacing: -.02em; line-height: 1;
+    margin-top: 12px;
+  }
+  h1 strong { font-weight: 700; }
+  .lede { margin-top: 16px; max-width: 520px; color: var(--muted); font-size: 16px; line-height: 1.5; }
+
+  /* ---------- Timeline track ---------- */
+  .track {
+    position: relative;
+    display: flex; justify-content: space-between;
+    margin: 40px 0 36px;
+    padding-top: 18px;
+  }
+  .track::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 26px;
+    height: 1px; background: var(--line);
+  }
+  .progress {
+    position: absolute; left: 0; top: 25px; height: 3px;
+    background: var(--ink); width: 0;
+    transition: width .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .node {
+    position: relative; z-index: 1;
+    background: none; border: 0; cursor: pointer;
+    font: inherit; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    flex: 1; text-align: center;
+  }
+  .dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--paper); border: 1px solid var(--ink);
+    transition: background .3s, transform .3s;
+  }
+  .node:hover .dot { transform: scale(1.25); }
+  .node[aria-selected="true"] { color: var(--ink); }
+  .node[aria-selected="true"] .dot { background: var(--ink); transform: scale(1.3); }
+  .node .yr { font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+
+  /* ---------- Detail card ---------- */
+  .card {
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 36px;
+    display: grid; grid-template-columns: 1fr 220px; gap: 32px;
+    align-items: center;
+    min-height: 260px;
+    transition: opacity .35s, transform .35s;
+  }
+  .card.swap { opacity: 0; transform: translateY(8px); }
+  .card h2 { font-size: 28px; font-weight: 600; letter-spacing: -.01em; }
+  .card .tag {
+    display: inline-block; margin-bottom: 14px;
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .card p { margin-top: 14px; font-size: 16px; line-height: 1.6; color: #33413a; }
+  .icon {
+    width: 100%; aspect-ratio: 1; border-radius: 14px;
+    background: var(--paper); border: 1px solid var(--line);
+    display: grid; place-items: center;
+  }
+  .icon svg { width: 62%; height: 62%; }
+
+  .controls {
+    display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end;
+  }
+  .btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid var(--ink); background: transparent; color: var(--ink);
+    font-size: 18px; cursor: pointer; transition: background .2s, color .2s;
+  }
+  .btn:hover { background: var(--ink); color: var(--paper); }
+  .btn:focus-visible, .node:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+  footer {
+    margin-top: 48px; font-size: 12px; color: var(--muted);
+    letter-spacing: .04em;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 760px) {
+    .card { grid-template-columns: 1fr; padding: 26px; }
+    .icon { max-width: 140px; }
+    .track { overflow-x: auto; padding-bottom: 8px; }
+    .node { min-width: 84px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene" aria-hidden="true">
+  <div class="sun" id="sun"></div>
+  <div class="layer back" id="l1">
+    <svg viewBox="0 0 1200 260" preserveAspectRatio="none">
+      <path fill="#b9c9bf" d="M0 200 Q200 90 420 170 T860 150 T1200 120 L1200 260 L0 260Z"/>
+    </svg>
+  </div>
+  <div class="layer mid" id="l2">
+    <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
+      <path fill="#7f9a8a" d="M0 170 Q260 60 520 150 T1040 120 T1200 140 L1200 240 L0 240Z"/>
+    </svg>
+  </div>
+  <div class="layer front" id="l3">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <path fill="#1d2a24" d="M0 150 Q300 110 600 140 T1200 120 L1200 200 L0 200Z"/>
+    </svg>
+  </div>
+</div>
+
+<main>
+  <header>
+    <div class="eyebrow">History · 1966 — 2004</div>
+    <h1>The making of <strong>the UAE</strong></h1>
+    <p class="lede">A short timeline: from Abu Dhabi's new ruler to a federation of seven emirates, with Sheikh Zayed bin Sultan Al Nahyan at the center.</p>
+  </header>
+
+  <nav class="track" id="track" role="tablist" aria-label="Timeline">
+    <div class="progress" id="progress"></div>
+  </nav>
+
+  <section class="card" id="card" aria-live="polite">
+    <div>
+      <span class="tag" id="cardTag"></span>
+      <h2 id="cardTitle"></h2>
+      <p id="cardText"></p>
+    </div>
+    <div class="icon" id="cardIcon"></div>
+  </section>
+
+  <div class="controls">
+    <button class="btn" id="prev" aria-label="Previous event">←</button>
+    <button class="btn" id="next" aria-label="Next event">→</button>
+  </div>
+
+  <footer>Use ← → keys or the dots. Move your pointer to shift the layers.</footer>
+</main>
+
+<script>
+  const events = [
+    {
+      year: "1966",
+      tag: "Abu Dhabi",
+      title: "Zayed becomes ruler",
+      text: "Sheikh Zayed bin Sultan Al Nahyan becomes ruler of Abu Dhabi in August 1966, taking over from his brother.",
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linecap="round"><path d="M12 46h40M16 46V30M28 46V30M40 46V30M48 46V30M10 30h44M32 14l18 12H14z"/></svg>`
+    },
+    {
+      year: "1968",
+      tag: "Context",
+      title: "Britain leaves the Gulf",
+      text: "London announces it will end its treaty role in the Gulf by 1971, pushing the emirates to decide their future together.",
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linecap="round"><path d="M32 12v34M22 22h20M18 46c4 4 24 4 28 0M24 46l-6-12M40 46l6-12"/><circle cx="32" cy="12" r="3"/></svg>`
+    },
+    {
+      year: "1971",
+      tag: "Federation",
+      title: "Six emirates unite",
+      text: "On 2 December 1971, Abu Dhabi, Dubai, Sharjah, Ajman, Umm Al Quwain and Fujairah form the United Arab Emirates. Ras Al Khaimah joins a few months later.",
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5"><circle cx="32" cy="16" r="6"/><circle cx="16" cy="30" r="6"/><circle cx="48" cy="30" r="6"/><circle cx="22" cy="46" r="6"/><circle cx="42" cy="46" r="6"/><circle cx="32" cy="32" r="6" fill="#00732f" stroke="#00732f"/></svg>`
+    },
+    {
+      year: "1971",
+      tag: "Presidency",
+      title: "Zayed, first president",
+      text: "Sheikh Zayed is chosen as the founder and first President of the UAE, a role he holds until 2004.",
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linejoin="round"><path d="M32 8l6.5 16H56L42 34l5 17-15-10-15 10 5-17L8 24h17.5z"/></svg>`
+    },
+    {
+      year: "2004",
+      tag: "Legacy",
+      title: "A nation built to last",
+      text: "Sheikh Zayed dies in November 2004. His son Khalifa becomes president, and the federation he built continues.",
+      icon: `<svg viewBox="0 0 64 64" fill="none" stroke="#1d2a24" stroke-width="2.5" stroke-linecap="round"><path d="M10 44h44M18 44a14 14 0 0128 0"/><path d="M32 18v8M22 24l4 4M42 24l-4 4"/></svg>`
+    }
+  ];
+
+  const track = document.getElementById("track");
+  const progress = document.getElementById("progress");
+  const card = document.getElementById("card");
+  const cardTag = document.getElementById("cardTag");
+  const cardTitle = document.getElementById("cardTitle");
+  const cardText = document.getElementById("cardText");
+  const cardIcon = document.getElementById("cardIcon");
+  const sun = document.getElementById("sun");
+  const layers = [
+    [document.getElementById("l1"), 14],
+    [document.getElementById("l2"), 28],
+    [document.getElementById("l3"), 44]
+  ];
+
+  // Build nodes
+  const nodes = events.map((ev, i) => {
+    const b = document.createElement("button");
+    b.className = "node";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-label", `${ev.year}: ${ev.title}`);
+    b.innerHTML = `<span class="dot"></span><span class="yr">${ev.year}</span>`;
+    b.addEventListener("click", () => show(i));
+    track.insertBefore(b, progress);
+    return b;
+  });
+
+  let current = 0;
+  function show(i) {
+    current = (i + events.length) % events.length;
+    const ev = events[current];
+    card.classList.add("swap");
+    setTimeout(() => {
+      cardTag.textContent = `${ev.year} · ${ev.tag}`;
+      cardTitle.textContent = ev.title;
+      cardText.textContent = ev.text;
+      cardIcon.innerHTML = ev.icon;
+      card.classList.remove("swap");
+    }, 180);
+    nodes.forEach((n, k) => n.setAttribute("aria-selected", k === current ? "true" : "false"));
+    progress.style.width = `${(current / (events.length - 1)) * 100}%`;
+    sun.style.transform = `translateX(${current * -18}px) scale(${1 - current * 0.04})`;
+    sun.style.background = ["#00732f","#c49a2c","#ff0000","#1d2a24","#7f9a8a"][current];
+  }
+
+  document.getElementById("prev").addEventListener("click", () => show(current - 1));
+  document.getElementById("next").addEventListener("click", () => show(current + 1));
+  window.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight") show(current + 1);
+    if (e.key === "ArrowLeft") show(current - 1);
+  });
+
+  // Parallax on pointer
+  window.addEventListener("pointermove", e => {
+    const x = (e.clientX / window.innerWidth - 0.5);
+    const y = (e.clientY / window.innerHeight - 0.5);
+    layers.forEach(([el, depth]) => {
+      el.style.transform = `translate(${x * depth}px, ${y * depth * 0.5}px)`;
+    });
+  });
+
+  show(0);
+</script>
+</body>
+</html>
